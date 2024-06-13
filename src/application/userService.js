@@ -1,4 +1,4 @@
-const userService = {
+export const userService = {
     login: async function(credentials) {
         const response = await fetch('/api/login', {
             method: 'POST',
@@ -14,5 +14,3 @@ const userService = {
         return response.json();
     }
 };
-
-export default userService;
