@@ -1,4 +1,4 @@
-function calculateBill(billItems) {
+export function calculateBill(billItems) {
     let subtotal = 0;
     billItems.forEach(item => {
         subtotal += item.qty * item.price;
@@ -7,5 +7,3 @@ function calculateBill(billItems) {
     const total = subtotal + ppn;
     return { subtotal, ppn, total };
 }
-
-export default calculateBill;
