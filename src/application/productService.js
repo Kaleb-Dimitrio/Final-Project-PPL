@@ -1,11 +1,11 @@
-const productService = {
+export const productService = {
     getProducts: async function() {
-        const response = await fetch('/api/products');
+        const response = await fetch('http://localhost:3000/api/products');
         if (!response.ok) throw new Error('Failed to fetch products');
         return response.json();
     },
     addProduct: async function(product) {
-        const response = await fetch('/api/products', {
+        const response = await fetch('http://localhost:3000/api/products', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -16,7 +16,7 @@ const productService = {
         return response.json();
     },
     deleteProduct: async function(productId) {
-        const response = await fetch(`/api/products/${productId}`, {
+        const response = await fetch(`http://localhost:3000/api/products/${productId}`, {
             method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete product');
@@ -24,4 +24,3 @@ const productService = {
     }
 };
 
-export default productService;
