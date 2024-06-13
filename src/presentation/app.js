@@ -1,5 +1,5 @@
-import calculateBill from '../business/billCalculator.js';
-import productService from '../application/productService.js';
+import { productService } from '../application/productService.js';
+import { calculateBill } from '../business/billCalculator.js';
 
 $(document).ready(function() {
     const menuList = $('#menu-list');
@@ -127,3 +127,4 @@ $(document).ready(function() {
 
     fetchProducts();
 });
+
