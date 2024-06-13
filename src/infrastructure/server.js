@@ -3,8 +3,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
-const productRepository = require('../data/productRepository');
-const userRepository = require('../data/userRepository');
+const productRepository = require('../data/productRepository'); // Corrected path
+const userRepository = require('../data/userRepository'); // Corrected path
+const db = require('./db'); // Ensure the db module is imported
 
 const app = express();
 const PORT = 3000;
@@ -12,19 +13,19 @@ const PORT = 3000;
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../presentation')));
 app.use(session({
-    secret: 'secret-key',  // Gantilah ini dengan kunci rahasia yang lebih kuat untuk produksi
+    secret: 'secret-key',
     resave: false,
-    saveUninitialized: false, // Ubah menjadi false untuk mencegah penyimpanan sesi yang tidak dimodifikasi
+    saveUninitialized: false,
     cookie: {
-        secure: false, // Ubah menjadi true jika menggunakan HTTPS
-        maxAge: 60000 // Set waktu kedaluwarsa cookie (contoh: 1 menit)
+        secure: false,
+        maxAge: 60000 // Set cookie expiration time
     }
 }));
 
 // Debugging middleware
 app.use((req, res, next) => {
     console.log(`Received request: ${req.method} ${req.url}`);
-    console.log('Session:', req.session); // Log session untuk debugging
+    console.log('Session:', req.session);
     next();
 });
 
@@ -43,8 +44,8 @@ app.post('/api/login', (req, res) => {
         bcrypt.compare(password, user.password, (err, result) => {
             if (result) {
                 console.log('Password match');
-                req.session.admin = true; // Set session admin
-                console.log('Session set:', req.session); // Log session for debugging
+                req.session.admin = true;
+                console.log('Session set:', req.session);
                 return res.json({ message: 'Login successful' });
             } else {
                 console.error('Password mismatch');
@@ -56,15 +57,15 @@ app.post('/api/login', (req, res) => {
 
 app.get('/admin', (req, res) => {
     if (req.session.admin) {
-        console.log('Accessing admin page with session:', req.session); // Log session
-        res.sendFile(path.join(__dirname, '../presentation/admin.html')); // Arahkan ke admin.html
+        console.log('Accessing admin page with session:', req.session);
+        res.sendFile(path.join(__dirname, '../presentation/admin.html'));
     } else {
-        console.log('Unauthorized access attempt to admin page'); // Log unauthorized access
+        console.log('Unauthorized access attempt to admin page');
         res.status(401).send('Unauthorized');
     }
 });
 
-// Endpoint lainnya
+// Product endpoints
 app.post('/api/products', (req, res) => {
     productRepository.add(req.body, (err) => {
         if (err) {
@@ -92,11 +93,10 @@ app.delete('/api/products/:id', (req, res) => {
     });
 });
 
-// Rute untuk halaman web
 app.get('/admin', (req, res) => {
     if (req.session.admin) {
-        console.log('Accessing admin page with session:', req.session); // Log session
-        res.sendFile(path.join(__dirname, '../presentation/admin.html')); // Arahan ke file admin.html
+        console.log('Accessing admin page with session:', req.session);
+        res.sendFile(path.join(__dirname, '../presentation/admin.html'));
     } else {
         res.status(401).send('Unauthorized');
     }
@@ -106,7 +106,29 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../presentation/index.html'));
 });
 
-// Jalankan server
+// Function to insert initial products
+function insertInitialProducts() {
+    const initialProducts = [
+        { id: '1', name: 'Coffee', price: 10000 },
+        { id: '2', name: 'Tea', price: 8000 },
+        { id: '3', name: 'Sandwich', price: 15000 }
+    ];
+
+    initialProducts.forEach(product => {
+        db.run(`INSERT OR IGNORE INTO products (id, name, price) VALUES (?, ?, ?)`, 
+               [product.id, product.name, product.price], 
+               (err) => {
+            if (err) {
+                console.error('Error inserting initial product:', err.message);
+            }
+        });
+    });
+}
+
+// Insert initial products on server startup
+insertInitialProducts();
+
+// Start server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
