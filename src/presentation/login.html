@@ -17,9 +17,8 @@
         <div id="login-message"></div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../application/userService.js" type="module"></script>
     <script type="module">
-        import userService from '../application/userService.js';
+        import { userService } from '../application/userService.js';
 
         $(document).ready(function() {
             $('#login-form').submit(async function(e) {
@@ -42,3 +41,4 @@
     </script>
 </body>
 </html>
+
