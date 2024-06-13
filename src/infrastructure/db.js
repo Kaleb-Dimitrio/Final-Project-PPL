@@ -25,7 +25,6 @@ db.serialize(() => {
         password TEXT NOT NULL
     )`);
 
-    // Hashing password for default admin
     const saltRounds = 10;
     const defaultPassword = 'password';
     bcrypt.hash(defaultPassword, saltRounds, (err, hashedPassword) => {
